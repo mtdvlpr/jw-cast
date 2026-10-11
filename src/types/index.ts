@@ -1,4 +1,4 @@
-import type { ImageType } from "@/types/media.types";
+import type { ImageType } from '@/types/media.types';
 
 export type Prettify<T> = {
   [K in keyof T]: T[K];
@@ -215,7 +215,7 @@ export interface Result {
 }
 
 export interface Links {
-  "jw.org": string;
+  'jw.org': string;
 }
 
 export interface Image {

@@ -1,53 +1,48 @@
-import { useLocalStorage } from "@vueuse/core";
+import { useLocalStorage } from '@vueuse/core';
 
-export const useAppStore = defineStore("app", () => {
-  const allLanguages = useLocalStorage<
-    Partial<Record<Locale | "-", Language[]>>
-  >("languages", {});
+export const useAppStore = defineStore('app', () => {
+  const allLanguages = useLocalStorage<Partial<Record<Locale | '-', Language[]>>>('languages', {});
   const languages = computed<Language[]>(
     () =>
       allLanguages.value[siteLocale.value] ??
-      allLanguages.value["-"] ??
-      allLanguages.value["en"] ??
-      allLanguages.value["nl"] ?? [
+      allLanguages.value['-'] ??
+      allLanguages.value['en'] ??
+      allLanguages.value['nl'] ?? [
         {
-          code: "O",
-          locale: "nl",
-          vernacular: "Nederlands",
-          name: "Nederlands",
+          code: 'O',
+          locale: 'nl',
+          vernacular: 'Nederlands',
+          name: 'Nederlands',
         },
         {
-          code: "E",
-          locale: "en",
-          vernacular: "English",
-          name: "Engels",
+          code: 'E',
+          locale: 'en',
+          vernacular: 'English',
+          name: 'Engels',
         },
       ],
   );
 
-  const allTranslations = useLocalStorage<
-    Partial<Record<Locale, Translations>>
-  >("translations", {});
+  const allTranslations = useLocalStorage<Partial<Record<Locale, Translations>>>(
+    'translations',
+    {},
+  );
 
   const translations = computed<Translations | null>(
     () =>
       allTranslations.value[siteLocale.value] ??
-      allTranslations.value["en"] ??
-      allTranslations.value["nl"] ??
+      allTranslations.value['en'] ??
+      allTranslations.value['nl'] ??
       null,
   );
 
-  const siteLocale = ref<Locale>("nl");
-  const siteLanguage = computed(() =>
-    languages.value.find((l) => l.locale === siteLocale.value),
-  );
+  const siteLocale = ref<Locale>('nl');
+  const siteLanguage = computed(() => languages.value.find((l) => l.locale === siteLocale.value));
 
-  const videoLocale = useLocalStorage<Locale>("videoLocale", "en");
-  const videoLanguage = computed(() =>
-    languages.value.find((l) => l.locale === videoLocale.value),
-  );
+  const videoLocale = useLocalStorage<Locale>('videoLocale', 'en');
+  const videoLanguage = computed(() => languages.value.find((l) => l.locale === videoLocale.value));
 
-  const subtitleLocale = useLocalStorage<Locale>("subtitleLocale", "nl");
+  const subtitleLocale = useLocalStorage<Locale>('subtitleLocale', 'nl');
   const subtitleLanguage = computed(() =>
     languages.value.find((l) => l.locale === subtitleLocale.value),
   );
@@ -68,39 +63,42 @@ export const useAppStore = defineStore("app", () => {
 
   const fetchLanguages = async () => {
     const localeLanguages = allLanguages.value[siteLocale.value];
-    if (localeLanguages?.length && localeLanguages.length > 2) return;
+    if (localeLanguages?.length && localeLanguages.length > 2) {
+      return;
+    }
 
     try {
       const res = await fetch(
-        `${__MEDIATOR_URL__}/languages/${siteLanguage.value?.code ?? "-"}/all?clientType=www`,
+        `${__MEDIATOR_URL__}/languages/${siteLanguage.value?.code ?? '-'}/all?clientType=www`,
       );
       const data = (await res.json()) as { languages: Language[] };
-      allLanguages.value[siteLanguage.value?.locale ?? "-"] = [
+      allLanguages.value[siteLanguage.value?.locale ?? '-'] = [
         ...data.languages
-          .filter((l) => ["nl", "en"].includes(l.locale))
-          .sort((a, b) => b.locale.localeCompare(a.locale)),
-        ...data.languages.filter((l) => !["nl", "en"].includes(l.locale)),
+          .filter((l) => ['nl', 'en'].includes(l.locale))
+          .toSorted((a, b) => b.locale.localeCompare(a.locale)),
+        ...data.languages.filter((l) => !['nl', 'en'].includes(l.locale)),
       ];
-    } catch (e) {
-      console.debug("Failed to fetch languages", e);
+    } catch (error) {
+      console.debug('Failed to fetch languages', error);
     }
   };
 
   const fetchTranslations = async () => {
-    if (!siteLanguage.value) return;
-    if (allTranslations.value[siteLocale.value]) return;
+    if (!siteLanguage.value) {
+      return;
+    }
+    if (allTranslations.value[siteLocale.value]) {
+      return;
+    }
 
     try {
-      const res = await fetch(
-        `${__MEDIATOR_URL__}/translations/${siteLanguage.value.code}`,
-      );
+      const res = await fetch(`${__MEDIATOR_URL__}/translations/${siteLanguage.value.code}`);
       const data = (await res.json()) as {
         translations: Record<JwLangCode, Translations>;
       };
-      allTranslations.value[siteLocale.value] =
-        data.translations[siteLanguage.value.code];
-    } catch (e) {
-      console.debug("Failed to fetch translations", e);
+      allTranslations.value[siteLocale.value] = data.translations[siteLanguage.value.code];
+    } catch (error) {
+      console.debug('Failed to fetch translations', error);
     }
   };
 

@@ -28,10 +28,7 @@ export interface CategoryResult {
   pagination?: MediatorPagination;
 }
 
-export interface CategoryResultDetailed extends Omit<
-  CategoryResult,
-  "category"
-> {
+export interface CategoryResultDetailed extends Omit<CategoryResult, 'category'> {
   category: CategoryDetailed;
 }
 
@@ -39,11 +36,9 @@ export interface CategorySub extends CategoryParent {
   media?: MediaItem[];
 }
 
-export type CategoryType = "container" | "ondemand";
+export type CategoryType = 'container' | 'ondemand';
 
-export type ImagesObject = Partial<
-  Record<ImageType, Partial<Record<ImageSize, string>>>
->;
+export type ImagesObject = Partial<Record<ImageType, Partial<Record<ImageSize, string>>>>;
 
 export interface MediaDataResult {
   language: MediatorResultLanguage;
@@ -51,22 +46,15 @@ export interface MediaDataResult {
 }
 
 export type MediaFetcher =
-  | PublicationDocFetcher
-  | PublicationFetcher
-  | { key: MediaKey; langwritten: JwLangCode };
+  PublicationDocFetcher | PublicationFetcher | { key: MediaKey; langwritten: JwLangCode };
 
 export type MediaItem = MediaItemAudio | MediaItemVideo;
 
-export interface MediaItemAudio extends Omit<
-  MediaItemGeneric,
-  "files" | "type"
-> {
+export interface MediaItemAudio extends Omit<MediaItemGeneric, 'files' | 'type'> {
   files: MediaItemFileAudio[];
-  type: "audio";
+  type: 'audio';
 }
 
-/* eslint-disable perfectionist/sort-interfaces */
-/* eslint-disable perfectionist/sort-object-types */
 export interface MediaItemFile {
   progressiveDownloadURL: string;
   checksum: string;
@@ -86,17 +74,10 @@ export interface MediaItemFile {
     checksum: string;
   };
 }
-/* eslint-enable perfectionist/sort-interfaces */
-/* eslint-enable perfectionist/sort-object-types */
 
 export interface MediaItemFileAudio extends Omit<
   MediaItemFile,
-  | "frameHeight"
-  | "frameRate"
-  | "frameWidth"
-  | "label"
-  | "languageAgnosticNaturalKey"
-  | "mimetype"
+  'frameHeight' | 'frameRate' | 'frameWidth' | 'label' | 'languageAgnosticNaturalKey' | 'mimetype'
 > {
   label: null;
   languageAgnosticNaturalKey: MediaKeyAudio;
@@ -104,20 +85,19 @@ export interface MediaItemFileAudio extends Omit<
 }
 
 export interface MediaItemFileVideo extends RequiredFields<
-  Omit<MediaItemFile, "label" | "languageAgnosticNaturalKey" | "mimetype">,
-  "frameHeight" | "frameRate" | "frameWidth"
+  Omit<MediaItemFile, 'label' | 'languageAgnosticNaturalKey' | 'mimetype'>,
+  'frameHeight' | 'frameRate' | 'frameWidth'
 > {
   label: `${number}p`;
   languageAgnosticNaturalKey: MediaKeyVideo;
   mimetype: `video/${string}`;
 }
 
-/* eslint-disable perfectionist/sort-interfaces */
 export interface MediaItemGeneric {
   guid: string;
   languageAgnosticNaturalKey: MediaKey;
   naturalKey: string;
-  type: "audio" | "video";
+  type: 'audio' | 'video';
   primaryCategory: CategoryKey;
   title: string;
   description: string;
@@ -131,36 +111,26 @@ export interface MediaItemGeneric {
   availableLanguages: JwLangCode[];
   printReferences: string[];
 }
-/* eslint-enable perfectionist/sort-interfaces */
 
-export interface MediaItemVideo extends Omit<
-  MediaItemGeneric,
-  "files" | "type"
-> {
+export interface MediaItemVideo extends Omit<MediaItemGeneric, 'files' | 'type'> {
   files: MediaItemFileVideo[];
-  type: "video";
+  type: 'video';
 }
 
 export type MediaKey = MediaKeyAudio | MediaKeyVideo;
 
 export type MediaKeyAudio =
-  | MediaKeyDocId<"AUDIO">
-  | MediaKeyPub<"AUDIO">
-  | MediaKeyPubIssue<"AUDIO">;
+  MediaKeyDocId<'AUDIO'> | MediaKeyPub<'AUDIO'> | MediaKeyPubIssue<'AUDIO'>;
 
-export type MediaKeyDocId<T extends "AUDIO" | "VIDEO"> =
-  `docid-${number}_${MediaTrack}_${T}`;
+export type MediaKeyDocId<T extends 'AUDIO' | 'VIDEO'> = `docid-${number}_${MediaTrack}_${T}`;
 
-export type MediaKeyPub<T extends "AUDIO" | "VIDEO"> =
-  `pub-${string}_${MediaTrack}_${T}`;
+export type MediaKeyPub<T extends 'AUDIO' | 'VIDEO'> = `pub-${string}_${MediaTrack}_${T}`;
 
-export type MediaKeyPubIssue<T extends "AUDIO" | "VIDEO"> =
+export type MediaKeyPubIssue<T extends 'AUDIO' | 'VIDEO'> =
   `pub-${string}_${number}_${MediaTrack}_${T}`;
 
 export type MediaKeyVideo =
-  | MediaKeyDocId<"VIDEO">
-  | MediaKeyPub<"VIDEO">
-  | MediaKeyPubIssue<"VIDEO">;
+  MediaKeyDocId<'VIDEO'> | MediaKeyPub<'VIDEO'> | MediaKeyPubIssue<'VIDEO'>;
 
 export interface MediatorCategoryDetailedQuery extends MediatorCategoryQuery {
   mediaLimit?: number;
@@ -194,11 +164,11 @@ export interface MediatorPagination {
 }
 
 export interface MediatorResultLanguage {
-  direction: "ltr" | "rtl";
+  direction: 'ltr' | 'rtl';
   isSignLanguage: boolean;
   JwLangCode: JwLangCode;
   locale: Locale;
   script: string;
 }
 
-export type MediaTrack = "x" | `${number}`;
+export type MediaTrack = 'x' | `${number}`;

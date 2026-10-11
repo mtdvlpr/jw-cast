@@ -1,5 +1,5 @@
-export type Locale = "nl" | "en";
-export type JwLangCode = "O" | "E";
+export type Locale = 'nl' | 'en';
+export type JwLangCode = 'O' | 'E';
 
 export interface Language {
   /** Watchtower code such as `O` and `E` */

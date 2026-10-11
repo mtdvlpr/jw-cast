@@ -5,52 +5,52 @@
  */
 
 // Composables
-import { createVuetify } from "vuetify";
-import { en, nl } from "vuetify/locale";
+import { createVuetify } from 'vuetify';
+import { en, nl } from 'vuetify/locale';
 
 // Styles
-import "@mdi/font/css/materialdesignicons.css";
-import "vuetify/styles";
+import '@mdi/font/css/materialdesignicons.css';
+import 'vuetify/styles';
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
   defaults: {
-    VAppBar: { color: "primary" },
+    VAppBar: { color: 'primary' },
     VAutocomplete: {
-      variant: "outlined",
-      hideDetails: "auto",
-      density: "compact",
+      variant: 'outlined',
+      hideDetails: 'auto',
+      density: 'compact',
     },
     VSelect: {
-      variant: "outlined",
-      hideDetails: "auto",
-      density: "compact",
+      variant: 'outlined',
+      hideDetails: 'auto',
+      density: 'compact',
     },
     VTextField: {
-      variant: "outlined",
-      hideDetails: "auto",
-      density: "compact",
+      variant: 'outlined',
+      hideDetails: 'auto',
+      density: 'compact',
     },
   },
   locale: {
-    locale: "nl",
-    fallback: "en",
+    locale: 'nl',
+    fallback: 'en',
     messages: { en, nl },
   },
   theme: {
-    defaultTheme: "system",
+    defaultTheme: 'system',
     transition: true,
     themes: {
       light: {
         dark: false,
         colors: {
-          primary: "#4a6da7",
+          primary: '#4a6da7',
         },
       },
       dark: {
         dark: true,
         colors: {
-          primary: "#4a6da7",
+          primary: '#4a6da7',
         },
       },
     },

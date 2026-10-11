@@ -1,34 +1,35 @@
 <template>
   <v-menu transition="slide-y-transition">
-    <template v-slot:activator="{ props: menuProps }">
+    <template #activator="{ props: menuProps }">
       <v-btn
         color="primary"
         v-bind="menuProps"
-        variant="elevated"
-        prepend-icon="mdi-download"
         :disabled="!media && !url"
+        prepend-icon="mdi-download"
         :text="store.translations?.hdgSubtitles"
+        variant="elevated"
       />
     </template>
 
     <v-list density="compact">
       <v-list-item
         v-if="url"
-        :title="store.translations?.btnDownload"
-        prepend-icon="mdi-download"
         :href="url"
+        prepend-icon="mdi-download"
+        :title="store.translations?.btnDownload"
       />
+
       <v-list-item
         v-if="media"
-        :title="$t('transcript')"
         prepend-icon="mdi-text"
+        :title="$t('transcript')"
         @click="store.openTranscript(media)"
       />
     </v-list>
   </v-menu>
 </template>
 <script setup lang="ts">
-import type { MediaItemVideo } from "@/types/mediator";
+import type { MediaItemVideo } from '@/types/mediator';
 
 defineProps<{
   media: MediaItemVideo | null;

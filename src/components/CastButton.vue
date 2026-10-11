@@ -1,22 +1,18 @@
 <template>
   <v-menu transition="slide-y-transition">
-    <template v-slot:activator="{ props: menuProps }">
+    <template #activator="{ props: menuProps }">
       <v-tooltip
         location="right"
-        :text="
-          store.translations?.[
-            `btnPlayWith${subtitleUrl ? '' : 'out'}Subtitles`
-          ]
-        "
+        :text="store.translations?.[`btnPlayWith${subtitleUrl ? '' : 'out'}Subtitles`]"
       >
-        <template v-slot:activator="{ props: tooltipProps }">
+        <template #activator="{ props: tooltipProps }">
           <v-btn
             color="primary"
             v-bind="{ ...menuProps, ...tooltipProps }"
-            variant="elevated"
-            prepend-icon="mdi-cast"
             :disabled="!media"
+            prepend-icon="mdi-cast"
             :text="store.translations?.btnPlay"
+            variant="elevated"
           />
         </template>
       </v-tooltip>
@@ -26,15 +22,15 @@
       <v-list-item
         v-for="file in media?.files.filter((f) => f.label !== '144p')"
         :key="file.checksum"
-        :title="file.label"
         :href="getChromecastUrl(file)"
         target="_blank"
+        :title="file.label"
       />
     </v-list>
   </v-menu>
 </template>
 <script setup lang="ts">
-import type { MediaItemVideo } from "@/types/mediator";
+import type { MediaItemVideo } from '@/types/mediator';
 
 const props = defineProps<{
   media: MediaItemVideo | null;
@@ -44,15 +40,15 @@ const props = defineProps<{
 
 const store = useAppStore();
 
-const getChromecastUrl = (file: MediaItemFileVideo) => {
+function getChromecastUrl(file: MediaItemFileVideo) {
   const videoUrl = btoa(file.progressiveDownloadURL);
   // sfgc: subtitle foreground color = #ffffff
   // ss: subtitle size = 1.1
   let url = `https://chromecast.smplayer.info/index.php?sfgc=I2ZmZmZmZg==&ss=MS4x&url=${videoUrl}`;
 
   try {
-    url += `&title=${btoa(props.media!.title.replaceAll("—", "-"))}`;
-  } catch (error) {
+    url += `&title=${btoa(props.media!.title.replaceAll('—', '-'))}`;
+  } catch {
     // No title then, I guess
   }
 
@@ -65,5 +61,5 @@ const getChromecastUrl = (file: MediaItemFileVideo) => {
   }
 
   return url;
-};
+}
 </script>

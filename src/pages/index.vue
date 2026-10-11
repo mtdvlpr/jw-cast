@@ -5,57 +5,55 @@
         <h1>
           {{ store.translations?.hdgVideos }}
         </h1>
+
         <v-row>
-          <v-col xs="12" sm="6" lg="4" cols="12">
+          <v-col cols="12" lg="4" sm="6" xs="12">
             <v-autocomplete
               v-model="routeLocale"
+              class="mt-4"
+              :item-title="languageLabel"
+              item-value="locale"
               :items="store.languages"
               prepend-icon="mdi-translate"
-              :item-title="languageLabel"
-              class="mt-4"
-              item-value="locale"
             />
           </v-col>
         </v-row>
+
         <v-divider class="mt-8" />
       </v-col>
     </v-row>
+
     <template v-if="store.siteLanguage">
-      <VideoCategory category-name="LatestVideos" grid divider>
+      <VideoCategory category-name="LatestVideos" divider grid>
         <template #title-actions>
           <v-btn
+            color="primary"
             :icon="xs ? 'mdi-bell' : undefined"
             :prepend-icon="xs ? undefined : 'mdi-bell'"
             :text="xs ? undefined : channel.ctaLabel"
             variant="outlined"
-            color="primary"
             @click="store.getNotifiedDialog = true"
           />
         </template>
       </VideoCategory>
-      <VideoCategory
-        category-name="StudioMonthlyPrograms"
-        :limit="12"
-        divider
-      />
-      <VideoCategory category-name="StudioTalks" :limit="9" divider />
-      <VideoCategory
-        category-name="StudioNewsReports"
-        :limit="9"
-        class="mb-3"
-      />
+
+      <VideoCategory category-name="StudioMonthlyPrograms" divider :limit="12" />
+
+      <VideoCategory category-name="StudioTalks" divider :limit="9" />
+
+      <VideoCategory category-name="StudioNewsReports" class="mb-3" :limit="9" />
     </template>
   </v-container>
 </template>
 
 <script lang="ts" setup>
-import { languageLabel } from "@/utils/media";
-import VideoCategory from "@/components/VideoCategory.vue";
-import { useRouteParams } from "@vueuse/router";
-import { useDisplay } from "vuetify";
+import { useRouteParams } from '@vueuse/router';
+import { useDisplay } from 'vuetify';
+import VideoCategory from '@/components/VideoCategory.vue';
+import { languageLabel } from '@/utils/media';
 
 const { xs } = useDisplay();
 const store = useAppStore();
-const routeLocale = useRouteParams<Locale>("language", "nl");
+const routeLocale = useRouteParams<Locale>('language', 'nl');
 const channel = computed(() => channels[store.siteLocale] ?? channels.en);
 </script>
