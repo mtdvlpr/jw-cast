@@ -1,88 +1,80 @@
 <template>
-  <v-row v-if="category" justify="center">
+  <v-row justify="center">
     <v-col sm="12" xl="8" cols="12">
-      <div v-if="!hideTitle" class="d-flex align-center justify-space-between mb-6">
-        <span class="text-h4 font-weight-medium" v-text="category.name"></span>
+      <div
+        v-if="!hideTitle"
+        class="d-flex align-center justify-space-between mb-6"
+      >
+        <h2>
+          {{ category?.name || categoryName }}
+        </h2>
         <slot name="title-actions"></slot>
       </div>
-      <VideoGrid v-if="grid" :videos="media"></VideoGrid>
-      <VideoSwiper v-else :videos="media"></VideoSwiper>
-      <v-divider v-if="divider" :class="grid ? 'mt-8' : 'mt-5'"></v-divider>
+      <v-row v-if="grid">
+        <v-col v-for="video in media" :key="video.guid" sm="6" lg="4" cols="12">
+          <VideoCard
+            :title="video.title"
+            :images="video.images"
+            @click="store.openVideo(video)"
+          />
+        </v-col>
+      </v-row>
+      <VideoSwiper v-else :videos="media" />
+      <v-divider v-if="divider" :class="grid ? 'mt-8' : 'mt-5'" />
     </v-col>
   </v-row>
 </template>
+<script setup lang="ts">
+import type { CategoryOnDemandKey } from "@/types/media.types";
 
-<script lang="ts">
-import axios from 'axios';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { Getter, State } from 'vuex-class';
+import VideoSwiper from "@/components/VideoSwiper.vue";
+import VideoCard from "@/components/VideoCard.vue";
 
-import { Category, Language } from '@/types';
+const props = defineProps<{
+  grid?: boolean;
+  hideTitle?: boolean;
+  divider?: boolean;
+  categoryName: CategoryOnDemandKey;
+  limit?: number;
+  filter?: RegExp;
+}>();
 
-import VideoGrid from './VideoGrid.vue';
-import VideoSwiper from './VideoSwiper.vue';
+const store = useAppStore();
+const category = ref<Category | null>(null);
 
-@Component({
-  components: {
-    VideoGrid,
-    VideoSwiper,
-  },
-})
-export default class VideoCategory extends Vue {
-  @Prop({ type: Boolean })
-  grid!: boolean;
-  @Prop({ type: Boolean })
-  hideTitle!: boolean;
-  @Prop({ type: Boolean })
-  divider!: boolean;
-  @Prop({ type: String, required: true })
-  categoryName!: string;
-  @Prop({ type: Number })
-  limit!: number | undefined;
-  @Prop({ type: RegExp })
-  filter!: RegExp | undefined;
-
-  category: Category | null = null;
-
-  @State mediatorUrl!: string;
-  @Getter('getSiteLanguage') siteLanguage!: Language;
-
-  mounted() {
-    this.loadCategory();
-  }
-
-  async loadCategory() {
-    try {
-      this.category = (await axios.get(this.categoryUrl)).data.category;
-    } catch (error) {
-      this.category = null;
-    }
-  }
-
-  get categoryUrl() {
-    return `${this.mediatorUrl}/categories/${this.siteLanguage.code}/${
-      this.categoryName
-    }?detailed=1&clientType=www${this.limit ? `&limit=${this.limit}` : ''}`;
-  }
-
-  get media() {
-    if (this.category?.media === null) {
-      return [];
-    }
-    if (this.filter === undefined) {
-      return this.category?.media;
-    }
-    return this.category?.media.filter(medium =>
-      this.filter?.test(medium.languageAgnosticNaturalKey),
+const media = computed((): MediaItemVideo[] => {
+  if (!category.value?.media?.length) return [];
+  if (!props.filter)
+    return category.value.media.filter(
+      (v): v is MediaItemVideo => v.type === "video",
     );
-  }
+  return category.value.media.filter(
+    (video): video is MediaItemVideo =>
+      video.type === "video" &&
+      props.filter!.test(video.languageAgnosticNaturalKey),
+  );
+});
 
-  @Watch('siteLanguage')
-  onVideoLanguageChange(newLang: Language, oldLang: Language) {
-    if (newLang.locale === oldLang.locale) {
-      return;
-    }
-    this.loadCategory();
+const fetchCategory = async () => {
+  if (!store.siteLanguage) return;
+
+  try {
+    const res = await fetch(
+      `${__MEDIATOR_URL__}/categories/${store.siteLanguage.code}/${props.categoryName}?detailed=1&clientType=www${props.limit ? `&limit=${props.limit}` : ""}`,
+    );
+
+    const data = (await res.json()) as CategoryResultDetailed;
+    category.value = data.category;
+  } catch (e) {
+    category.value = null;
+    console.debug("Error fetching category:", e);
   }
-}
+};
+
+watchImmediate(
+  () => store.siteLocale,
+  () => {
+    fetchCategory();
+  },
+);
 </script>

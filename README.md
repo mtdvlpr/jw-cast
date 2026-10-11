@@ -1,77 +1,92 @@
-## JW Cast
+# vue3
 
-### https://jwcast.semdev.nl
+Scaffolded with Vuetify CLI.
 
----
+## ❗️ Documentation
 
-Deze site haalt videos op van [jw.org](https://jw.org) en maakt het mogelijk om twee verschillende talen te kiezen voor video en ondertitels. Je kan dus bijvoorbeeld de Broadcasting in het Engels bekijken met Nederlandse ondertiteling!
+- Primary docs: https://vuetifyjs.com/
+- Getting started guide: https://vuetifyjs.com/en/getting-started/installation/
+- Community support: https://community.vuetifyjs.com/
+- Issue tracker: https://issues.vuetifyjs.com/
 
-# Handleiding
+## 🧱 Stack
 
-1. Klik op de video die je wilt kijken
-   - De beschikbaarheid van videos hangt af van welke taal je hebt geselecteerd
-   - Via de knop `Zoeken` kan je elke video vinden die op jw.org staat
-2. Kies de taal van de audio bij het luidspreker-icoontje
-3. Kies de taal van de ondertiteling bij het ondertiteling-icoontje
-   - Let op: sommige videos of talen hebben geen ondertiteling!
+- Framework: Vue 3 + Vite
+- UI Library: Vuetify
+- Language: TypeScript
+- Package manager: pnpm
 
-Je hebt nu drie opties: Kijk op de site zelf, gebruik een [Chromecast](https://store.google.com/product/chromecast?hl=nl), of gebruik [VLC Media Player](https://www.videolan.org/vlc/):
+## 🧭 Start Here
 
-#### (NIEUW) **Kijk op de site zelf**:
+- Main entry: `src/main.ts`
+- Main app component: `src/App.vue`
+- Main styles: `src/styles/`
+- Plugin setup: `src/plugins/`
 
-4. Klik op play!
-   - Je kan ondertiteling in/uitschakelen met het `[CC]`-icoontje
-   - Je kan bij het tandwielicoontje de gewenste kwaliteit veranderen (en meer!)
-   - Let op: deze videospeler kan niet direct casten. Dit moet nog steeds via de oude methode
+## 📁 Project Structure
 
-#### **Met een Chromecast**:
+- `src/main.ts` — application entry point
+- `src/App.vue` — root component
+- `src/components/` — reusable Vue components
+- `src/plugins/` — plugin registration and setup
+- `src/styles/` — global styles and theme settings
+- `public/` — static public files
 
-4. Klik op `Afspelen` en kies de gewenste kwaliteit
-5. Een nieuw tabblad wordt geopend. Deze site heet SMPlayer, en maakt het mogelijk om de video naar je Chromecast te streamen
-6. Klik op `Connect to Chromecast`, en daarna op `Play on Chromecast`
+## ✨ Enabled Features
 
-#### **Met VLC Media Player**:
+- ESLint
+- Pinia
+- Vue I18n
+- Vuetify MCP
+- Vue Router
 
-4. Klik op de downloadknop voor `Video` en kies de gewenste kwaliteit
-5. Klik op de downloadknop voor `Ondertitels` en daarna op `Downloaden`
-6. Open de gedownloade video (.mp4 bestand) met VLC Media Player
-7. In VLC, klik bovenaan op `Ondertitels`, en dan op `Ondertitelbestand toevoegen...`
-8. Selecteer het ondertitelbestand wat je hebt gedownload (.vtt bestand), en klik op openen
-9. De video speelt nu af met de gekozen ondertiteling
+## 💿 Install
 
-# FAQ
+Use your selected package manager (pnpm) to install dependencies:
 
-#### **Hoe bekijk ik een video op mijn TV?**
-
-- Met een Chromecast:
-  - Een Chromecast is direct aangesloten op je TV, dus je hoeft alleen de stappen te volgen.
-- Met een laptop en een HDMI kabel:
-  - Heb je internet? Kijk de video op de site zelf.
-  - Geen internet als je de video wilt kijken? Download hem eerst en gebruik dan VLC Media Player.
-
-#### **Wat is het verschil tussen Chromecast en VLC?**
-
-- Met een Chromecast stream je direct van jw.org. Je hoeft een video dus niet eerst te downloaden, wat wel het geval is met de VLC methode.
-- Een Chromecast is aangesloten op een TV en kan direct een video daarop weergeven. Met VLC Media Player moet je een laptop verbinden via bijvoorbeeld een HDMI kabel om het op de TV te kijken.
-- Een Chromecast kost 30-40 euro, VLC is gratis en vereist alleen een laptop (en eventueel een HDMI kabel)
-
----
-
-## Technische informatie
-
-Alle data (beschikbare videos, afbeeldingen, mp4/vtt links) worden rechtstreeks van de jw.org API gehaald. Deze site is puur een interface om de data op een bruikbare manier te presenteren. Er wordt niks aan aangepast of veranderd.
-
-Als je de site zelf wilt bouwen, doe je dat zo:
-
-```
-git clone https://github.com/semkeijsper/jw-cast.git
-cd jw-cast
-yarn install
-yarn build
+```bash
+pnpm install
 ```
 
-Wil je de site op localhost starten, gebruik dan `yarn serve` in plaats van `yarn build`.
+## 🚀 Quick Start
 
-De site is gehost op GitHub Pages, de bestanden zijn te vinden in de branch `gh-pages`.
+```bash
+pnpm install
+pnpm dev
+```
 
-Deployment gebeurd via een subtree d.m.v. `git subtree push --prefix dist origin gh-pages`.
+## 🏗️ Build
+
+```bash
+pnpm build
+```
+
+## 🧪 Available Scripts
+
+- `pnpm dev`
+- `pnpm build`
+- `pnpm preview`
+- `pnpm build-only`
+- `pnpm type-check`
+- `pnpm lint`
+- `pnpm lint:fix`
+
+## 🤖 Vuetify MCP Server
+
+This project is configured with the Vuetify Model Context Protocol (MCP) server.
+To install and configure the MCP server for your favorite IDE (Cursor, Trae, Windsurf, VS Code, Claude Desktop, etc.) run:
+
+```bash
+pnpm dlx @vuetify/mcp-cli
+```
+
+This will open an interactive setup wizard to help you connect your AI assistant to the Vuetify ecosystem.
+
+## 💪 Support Vuetify Development
+
+This project uses Vuetify - an MIT licensed Open Source project. We are glad to welcome contributors and any support for ongoing development:
+
+- Contribute to Vuetify and ecosystem projects: https://github.com/vuetifyjs
+- Request enterprise support: https://support.vuetifyjs.com/
+- Sponsor on GitHub: https://github.com/sponsors/vuetifyjs
+- Support on Open Collective: https://opencollective.com/vuetify

@@ -1,19 +1,23 @@
-import Vue from 'vue';
-import { sync } from 'vuex-router-sync';
+/**
+ * main.ts
+ *
+ * Bootstraps Vuetify and other plugins then mounts the App`
+ */
 
-import App from './App.vue';
-import router from './router';
-import store from './store';
-import vuetify from './plugins/vuetify';
-import './plugins/swiper';
-import './plugins/video-player';
+// Composables
+import { createApp } from 'vue'
 
-sync(store, router);
-Vue.config.productionTip = false;
+// Plugins
+import { registerPlugins } from '@/plugins'
 
-new Vue({
-  router,
-  store,
-  vuetify,
-  render: h => h(App),
-}).$mount('#app');
+// Components
+import App from './App.vue'
+
+// Styles
+import 'unfonts.css'
+
+const app = createApp(App)
+
+registerPlugins(app)
+
+app.mount('#app')

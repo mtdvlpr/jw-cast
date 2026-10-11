@@ -1,78 +1,173 @@
-/* eslint-disable no-use-before-define */
-export interface Language {
-  /** Watchtower code such as `O` and `E` */
-  code: string;
-  /** ISO code such as `nl` and `en` */
-  locale: string;
-  /** Name of the language written in the language itself */
-  vernacular: string;
-  /** Name of the language written in the language used during the request */
-  name: string;
-  isLangPair?: boolean;
-  isSignLanguage?: boolean;
-  isRTL?: boolean;
-}
+import type { ImageType } from "@/types/media.types";
 
-export type Translations = { [key: string]: string };
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
 
-export interface Category {
-  key: string;
-  type: string;
-  name: string;
-  description: string;
-  media: Video[];
-}
+export type RequiredFields<T, K extends keyof T> = Required<Pick<T, K>> & T;
 
-export interface Video {
-  guid: string;
-  languageAgnosticNaturalKey: string;
-  naturalKey: string;
-  type: string;
-  primaryCategory: string;
-  title: string;
-  description: string;
-  firstPublished: Date;
-  duration: number;
-  durationFormattedHHMM: string;
-  durationFormattedMinSec: string;
-  files: File[];
-  images: Images;
-  availableLanguages: string[];
-}
-
-export interface File {
-  progressiveDownloadURL: string;
-  checksum: string;
-  filesize: number;
-  modifiedDatetime: Date;
-  duration: number;
-  label: string;
-  mimetype: string;
-  subtitled: boolean;
-  subtitles: {
-    url: string;
-    modifiedDatetime: Date;
-  };
-}
-
-export interface Images {
-  lss: {
-    lg: string;
-  };
-  lsr: {
-    xl: string;
-  };
-  pnr: {
-    lg: string;
-  };
-  wss: {
-    lg: string;
-    sm: string;
-  };
-  sqr: {
-    lg: string;
-  };
-}
+export type Translations = {
+  StreamThisChannel: string;
+  btnBack: string;
+  btnChromecast: string;
+  btnClose: string;
+  btnDisableFullScreen: string;
+  btnDisableSubtitles: string;
+  btnDownload: string;
+  btnEnableFullScreen: string;
+  btnEnableSubtitles: string;
+  btnGenericOff: string;
+  btnGenericOn: string;
+  btnMute: string;
+  btnNext: string;
+  btnOkay: string;
+  btnPause: string;
+  btnPlay: string;
+  btnPlayAllInCategory: string;
+  btnPlayFromBeginning: string;
+  btnPlayVideo: string;
+  btnPlayWithSubtitles: string;
+  btnPlayWithoutSubtitles: string;
+  btnPrevious: string;
+  btnQualitySelector: string;
+  btnReplay: string;
+  btnResume: string;
+  btnSearchFilterAll: string;
+  btnSearchFilterAudio: string;
+  btnSearchFilterVideo: string;
+  btnSeeMore: string;
+  btnSelectLanguage: string;
+  btnSelectedQualityItem: string;
+  btnShuffleDialogAction: string;
+  btnSkipBack: string;
+  btnSkipForward: string;
+  btnStartStreaming: string;
+  btnStillListening: string;
+  btnStillWatching: string;
+  btnStillWatchingGoBack: string;
+  btnStillWatchingGoHome: string;
+  btnStop: string;
+  btnStreamThisChannel: string;
+  btnUnmute: string;
+  btnWatchFromBeginning: string;
+  btnWatchNow: string;
+  btnWatchWithSubtitles: string;
+  btnWatchWithoutSubtitles: string;
+  btnYes: string;
+  hdgChannelGuide: string;
+  hdgDefaultChannel: string;
+  hdgLanguage: string;
+  hdgSearch: string;
+  hdgSettings: string;
+  hdgSubtitles: string;
+  hdgVideoResolution: string;
+  hdgVideos: string;
+  hdgWatchNow: string;
+  hdrComingUpNext: string;
+  homepageAudioBlockLink: string;
+  homepageAudioBlockText: string;
+  homepageAudioBlockTitle: string;
+  homepagePlatformsBlockText: string;
+  homepagePlatformsTitle: string;
+  homepageStreamingBlockLink: string;
+  homepageStreamingBlockText: string;
+  homepageStreamingBlockTitle: string;
+  homepageVODBlockLink: string;
+  homepageVODBlockText: string;
+  homepageVODBlockTitle: string;
+  itemPlayAllDesc: string;
+  itemPlayAllTitle: string;
+  itemShuffleDesc: string;
+  itemShuffleTitle: string;
+  lblAirPlay: string;
+  lblAudioPlayer: string;
+  lblAutomatic: string;
+  lblCast: string;
+  lblChannelGuide: string;
+  lblChooseLanguage: string;
+  lblCurrentTime: string;
+  lblDisconnectCast: string;
+  lblDispSubttlMixedCase: string;
+  lblDisplaySubtitles: string;
+  lblDownload: string;
+  lblDuration: string;
+  lblDurationTime: string;
+  lblFavoriteChannel: string;
+  lblFeatured: string;
+  lblLangSearchInput: string;
+  lblLanguageFilter: string;
+  lblLastChannel: string;
+  lblLength: string;
+  lblLoaded: string;
+  lblLoading: string;
+  lblLoadingImage: string;
+  lblMediaIsLoading: string;
+  lblMoreFromCollection: string;
+  lblNowPlaying: string;
+  lblOff: string;
+  lblOn: string;
+  lblPlaybackRateNormal: string;
+  lblProgress: string;
+  lblProgressBar: string;
+  lblProgressBarTiming: string;
+  lblQuality: string;
+  lblResultsShown: string;
+  lblSave: string;
+  lblSaved: string;
+  lblSearchInput: string;
+  lblSettings: string;
+  lblShare: string;
+  lblShuffleCategory: string;
+  lblSignLangFilter: string;
+  lblSpeed: string;
+  lblStreamingLoadingText: string;
+  lblSubtitles: string;
+  lblTimestampPlayingRange: string;
+  lblTimestampStartingAt: string;
+  lblVideoDwnldOptions: string;
+  lblVideoPlayer: string;
+  lblVolumeLevel: string;
+  lnkAboutUs: string;
+  lnkBackToVideos: string;
+  lnkDownload: string;
+  lnkHelp: string;
+  lnkHelpView: string;
+  lnkHome: string;
+  lnkHomeView: string;
+  lnkLanguage: string;
+  lnkPrivacy: string;
+  lnkRssSubscribe: string;
+  lnkSearch: string;
+  lnkSearchVideos: string;
+  lnkSeeAllMixedCase: string;
+  lnkSettings: string;
+  lnkShare: string;
+  lnkShareUppCase: string;
+  lnkTerms: string;
+  msgAPIFailureErrorBody: string;
+  msgAPIFailureErrorTitle: string;
+  msgAreYouStillListeningQuestion: string;
+  msgAreYouStillWatchingBody: string;
+  msgAreYouStillWatchingQuestion: string;
+  msgAreYouStillWatchingTitle: string;
+  msgGeneralErrorDialogBody: string;
+  msgGeneralErrorDialogTitle: string;
+  msgMediaNotSupported: string;
+  noSearchResultsText: string;
+  refineSearchResultsText: string;
+  rokuChannelName: string;
+  rokuStoreDescription: string;
+  rokuWebDescription: string;
+  searchResultsCountText: string;
+  titleLangListAppletv: string;
+  titleLangListRoku: string;
+  titleLangListWeb: string;
+  ttlAudio: string;
+  ttlHome: string;
+  ttlStreaming: string;
+  ttlVOD: string;
+  MsgNoContent: string;
+};
 
 // Search
 
@@ -120,11 +215,11 @@ export interface Result {
 }
 
 export interface Links {
-  'jw.org': string;
+  "jw.org": string;
 }
 
 export interface Image {
-  type: string;
+  type: ImageType;
   url: string;
 }
 

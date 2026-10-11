@@ -1,0 +1,204 @@
+export interface CategoriesResult {
+  categories: CategoryParent[];
+  language: MediatorResultLanguage;
+}
+
+export interface Category extends CategorySub {
+  parentCategory: CategoryParent | null;
+}
+
+export interface CategoryDetailed extends Category {
+  subcategories?: CategorySub[];
+}
+
+export type CategoryKey = CategoryContainerKey | CategoryOnDemandKey;
+
+export interface CategoryParent {
+  description: string;
+  images: ImagesObject;
+  key: CategoryKey;
+  name: string;
+  tags: CategoryTag[];
+  type: CategoryType;
+}
+
+export interface CategoryResult {
+  category: Category;
+  language: MediatorResultLanguage;
+  pagination?: MediatorPagination;
+}
+
+export interface CategoryResultDetailed extends Omit<
+  CategoryResult,
+  "category"
+> {
+  category: CategoryDetailed;
+}
+
+export interface CategorySub extends CategoryParent {
+  media?: MediaItem[];
+}
+
+export type CategoryType = "container" | "ondemand";
+
+export type ImagesObject = Partial<
+  Record<ImageType, Partial<Record<ImageSize, string>>>
+>;
+
+export interface MediaDataResult {
+  language: MediatorResultLanguage;
+  media: MediaItem[];
+}
+
+export type MediaFetcher =
+  | PublicationDocFetcher
+  | PublicationFetcher
+  | { key: MediaKey; langwritten: JwLangCode };
+
+export type MediaItem = MediaItemAudio | MediaItemVideo;
+
+export interface MediaItemAudio extends Omit<
+  MediaItemGeneric,
+  "files" | "type"
+> {
+  files: MediaItemFileAudio[];
+  type: "audio";
+}
+
+/* eslint-disable perfectionist/sort-interfaces */
+/* eslint-disable perfectionist/sort-object-types */
+export interface MediaItemFile {
+  progressiveDownloadURL: string;
+  checksum: string;
+  filesize: number;
+  modifiedDatetime: ISODateTime;
+  bitRate: number;
+  duration: number;
+  frameHeight?: number;
+  frameWidth?: number;
+  label: `${number}p` | null;
+  frameRate?: number;
+  mimetype: `${string}/${string}`;
+  subtitled: boolean;
+  subtitles?: {
+    url: string;
+    modifiedDatetime: ISODateTime;
+    checksum: string;
+  };
+}
+/* eslint-enable perfectionist/sort-interfaces */
+/* eslint-enable perfectionist/sort-object-types */
+
+export interface MediaItemFileAudio extends Omit<
+  MediaItemFile,
+  | "frameHeight"
+  | "frameRate"
+  | "frameWidth"
+  | "label"
+  | "languageAgnosticNaturalKey"
+  | "mimetype"
+> {
+  label: null;
+  languageAgnosticNaturalKey: MediaKeyAudio;
+  mimetype: `audio/${string}`;
+}
+
+export interface MediaItemFileVideo extends RequiredFields<
+  Omit<MediaItemFile, "label" | "languageAgnosticNaturalKey" | "mimetype">,
+  "frameHeight" | "frameRate" | "frameWidth"
+> {
+  label: `${number}p`;
+  languageAgnosticNaturalKey: MediaKeyVideo;
+  mimetype: `video/${string}`;
+}
+
+/* eslint-disable perfectionist/sort-interfaces */
+export interface MediaItemGeneric {
+  guid: string;
+  languageAgnosticNaturalKey: MediaKey;
+  naturalKey: string;
+  type: "audio" | "video";
+  primaryCategory: CategoryKey;
+  title: string;
+  description: string;
+  firstPublished: ISODateTime;
+  duration: number;
+  durationFormattedHHMM: DurationHHMM;
+  durationFormattedMinSec: DurationMinSec;
+  tags: MediaTag[];
+  files: MediaItemFile[];
+  images: ImagesObject;
+  availableLanguages: JwLangCode[];
+  printReferences: string[];
+}
+/* eslint-enable perfectionist/sort-interfaces */
+
+export interface MediaItemVideo extends Omit<
+  MediaItemGeneric,
+  "files" | "type"
+> {
+  files: MediaItemFileVideo[];
+  type: "video";
+}
+
+export type MediaKey = MediaKeyAudio | MediaKeyVideo;
+
+export type MediaKeyAudio =
+  | MediaKeyDocId<"AUDIO">
+  | MediaKeyPub<"AUDIO">
+  | MediaKeyPubIssue<"AUDIO">;
+
+export type MediaKeyDocId<T extends "AUDIO" | "VIDEO"> =
+  `docid-${number}_${MediaTrack}_${T}`;
+
+export type MediaKeyPub<T extends "AUDIO" | "VIDEO"> =
+  `pub-${string}_${MediaTrack}_${T}`;
+
+export type MediaKeyPubIssue<T extends "AUDIO" | "VIDEO"> =
+  `pub-${string}_${number}_${MediaTrack}_${T}`;
+
+export type MediaKeyVideo =
+  | MediaKeyDocId<"VIDEO">
+  | MediaKeyPub<"VIDEO">
+  | MediaKeyPubIssue<"VIDEO">;
+
+export interface MediatorCategoryDetailedQuery extends MediatorCategoryQuery {
+  mediaLimit?: number;
+}
+
+export interface MediatorCategoryQuery {
+  clientType?: ClientType;
+  limit?: number;
+  offset?: number;
+}
+
+export interface MediatorLanguage {
+  code: JwLangCode;
+  isLangPair: boolean;
+  isRTL: boolean;
+  isSignLanguage: boolean;
+  locale: Locale;
+  name: string;
+  script: string;
+  vernacular: string;
+}
+
+export interface MediatorLanguageResult {
+  languages: MediatorLanguage[];
+}
+
+export interface MediatorPagination {
+  limit: number;
+  offset: number;
+  totalCount: number;
+}
+
+export interface MediatorResultLanguage {
+  direction: "ltr" | "rtl";
+  isSignLanguage: boolean;
+  JwLangCode: JwLangCode;
+  locale: Locale;
+  script: string;
+}
+
+export type MediaTrack = "x" | `${number}`;

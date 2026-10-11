@@ -1,377 +1,224 @@
 <template>
   <v-dialog
     v-model="dialog"
-    @click:outside="dialog = false"
     max-width="900px"
     transition="dialog-bottom-transition"
-    :fullscreen="$vuetify.breakpoint.smAndDown"
+    :fullscreen="smAndDown"
   >
-    <v-card v-if="selectedVideo">
-      <v-toolbar dense>
-        <v-toolbar-title v-if="selectedVideo" style="word-break: normal; user-select: none;">
-          {{ `${selectedVideo.title} (${selectedVideo.durationFormattedHHMM})` }}
-        </v-toolbar-title>
-        <v-spacer></v-spacer>
+    <v-card>
+      <v-toolbar density="compact">
+        <v-toolbar-title
+          :text="`${videoTitle} (${videoMedia?.durationFormattedHHMM ?? store.selectedVideo?.durationFormattedHHMM})`"
+          style="user-select: none"
+        />
         <v-toolbar-items>
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn icon :href="jwOrgUrl" target="_blank" v-bind="attrs" v-on="on">
-                <v-icon>mdi-open-in-new</v-icon>
-              </v-btn>
+          <v-tooltip
+            :text="store.translations?.lnkHome || 'JW.ORG'"
+            location="bottom"
+          >
+            <template v-slot:activator="{ props: tooltipProps }">
+              <v-btn
+                icon="mdi-open-in-new"
+                :href="jwOrgUrl"
+                target="_blank"
+                v-bind="tooltipProps"
+              />
             </template>
-            <span v-text="translations.lnkHome"></span>
           </v-tooltip>
-          <v-btn icon @click="dialog = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
+          <v-btn icon="mdi-close" @click="dialog = false" />
         </v-toolbar-items>
       </v-toolbar>
-      <v-responsive v-if="loading || !videoMedia" :aspect-ratio="16 / 9" key="loading">
-        <v-container fill-height fluid>
-          <v-row justify="center">
-            <v-col align="center">
-              <v-progress-circular indeterminate color="primary" size="48"></v-progress-circular>
-            </v-col>
-          </v-row>
+      <v-responsive v-if="loading" :aspect-ratio="16 / 9" key="loading">
+        <v-container
+          class="fill-height d-flex align-center justify-center"
+          fluid
+        >
+          <v-progress-circular indeterminate color="primary" size="48" />
         </v-container>
       </v-responsive>
-      <v-responsive v-else-if="videoMedia" :aspect-ratio="16 / 9" key="video">
-        <video
-          id="player"
-          controls
-          crossorigin
-          playsinline
-          :poster="videoPoster"
-          style="width: 100%; height: 100%; object-fit: cover;"
-        >
-          <source
-            v-for="file in videoMedia.files.slice().reverse()"
-            :key="file.label"
-            :src="file.progressiveDownloadURL"
-            :type="file.mimetype"
-            :label="file.label"
-            :size="file.label.slice(0, -1)"
-          />
-          <track
-            v-if="captionUrl"
-            :src="captionUrl"
-            kind="captions"
-            :srclang="getVideoLanguage.locale"
-            :label="languageLabel(getVideoLanguage)"
-          />
-          <track
-            v-if="subtitleUrl"
-            :src="subtitleUrl"
-            kind="subtitles"
-            :default="true"
-            :srclang="getSubtitleLanguage.locale"
-            :label="languageLabel(getSubtitleLanguage)"
-          />
-          Your browser does not support the video tag.
-        </video>
+      <v-responsive v-else :aspect-ratio="16 / 9" key="video">
+        <media-i18n>
+          <video-player :poster="videoPoster">
+            <video-neutral-skin
+              style="aspect-ratio: 16 / 9; --media-border-radius: 0"
+            >
+              <video
+                id="player"
+                crossorigin="anonymous"
+                playsinline
+                style="width: 100%; height: 100%; object-fit: cover"
+              >
+                <source
+                  v-for="file in (videoMedia ?? store.selectedVideo)?.files
+                    .slice()
+                    .reverse()"
+                  :key="file.label"
+                  :src="file.progressiveDownloadURL"
+                  :type="file.mimetype"
+                  :label="file.label"
+                  :size="file.label.slice(0, -1)"
+                />
+                <track
+                  v-if="captionUrl"
+                  :src="captionUrl"
+                  kind="captions"
+                  :srclang="store.videoLocale"
+                  :label="
+                    store.videoLanguage
+                      ? languageLabel(store.videoLanguage)
+                      : store.videoLocale
+                  "
+                />
+                <track
+                  v-if="subtitleUrl"
+                  :src="subtitleUrl"
+                  kind="subtitles"
+                  :default="true"
+                  :srclang="store.subtitleLocale"
+                  :label="
+                    store.subtitleLanguage
+                      ? languageLabel(store.subtitleLanguage)
+                      : store.subtitleLocale
+                  "
+                />
+                {{ $t("videoNotSupported") }}
+              </video>
+            </video-neutral-skin>
+          </video-player>
+        </media-i18n>
       </v-responsive>
       <v-card-text class="px-3 pb-3">
-        <v-container>
-          <v-row :no-gutters="xsOnly">
+        <v-container fluid>
+          <v-row :no-gutters="xs">
             <v-col cols="12" sm="6">
               <v-autocomplete
                 ref="vidLangSelect"
-                v-model="videoLanguage"
+                v-model="store.videoLocale"
                 :items="availableLanguages"
-                class="mt-4"
-                hide-details
                 prepend-icon="mdi-volume-high"
-                :item-text="languageLabel"
+                :item-title="languageLabel"
                 item-value="locale"
-                outlined
-                dense
-              ></v-autocomplete>
+              />
             </v-col>
             <v-col cols="12" sm="6">
               <v-autocomplete
                 ref="subLangSelect"
-                v-model="subtitleLanguage"
+                v-model="store.subtitleLocale"
                 :items="availableLanguages"
-                class="mt-4"
-                hide-details
                 prepend-icon="mdi-subtitles"
-                :item-text="languageLabel"
+                :item-title="languageLabel"
                 item-value="locale"
-                outlined
-                dense
-              ></v-autocomplete>
+              />
             </v-col>
           </v-row>
         </v-container>
-        <!-- Button components use v-bind as props are the same name as the variables -->
-        <!-- For mobile -->
-        <v-card-actions v-if="xsOnly">
-          <CastButton v-bind="{ videoMedia, subtitleMedia, subtitleUrl }"></CastButton>
+        <v-card-actions v-if="xs">
+          <CastButton
+            :media="videoMedia"
+            :subtitle-media="subtitleMedia"
+            :subtitle-url="subtitleUrl"
+          />
         </v-card-actions>
         <v-card-actions>
-          <!-- For non-mobile -->
-          <template v-if="!xsOnly">
-            <CastButton v-bind="{ videoMedia, subtitleMedia, subtitleUrl }"></CastButton>
-            <v-spacer></v-spacer>
+          <template v-if="!xs">
+            <CastButton
+              :media="videoMedia"
+              :subtitle-media="subtitleMedia"
+              :subtitle-url="subtitleUrl"
+            />
+            <v-spacer />
           </template>
-          <VideoButton v-bind="{ videoMedia }"></VideoButton>
-          <SubtitleButton v-bind="{ subtitleMedia, subtitleUrl }"></SubtitleButton>
+          <DownloadButton :media="videoMedia" />
+          <SubtitleButton :media="subtitleMedia" :url="subtitleUrl" />
         </v-card-actions>
       </v-card-text>
     </v-card>
   </v-dialog>
 </template>
+<script setup lang="ts">
+import { fetchMediaItem, languageLabel } from "@/utils/media";
+import { useDisplay } from "vuetify";
+import DownloadButton from "@/components/DownloadButton.vue";
+import SubtitleButton from "@/components/SubtitleButton.vue";
+import CastButton from "@/components/CastButton.vue";
 
-<script lang="ts">
-import axios from 'axios';
-import { Component, Vue, Watch } from 'vue-property-decorator';
-import { Getter, Mutation, State } from 'vuex-class';
+import "@videojs/html/i18n";
+import "@videojs/html/video/player";
+import "@videojs/html/video/neutral-skin";
+import "@videojs/html/i18n/locales/nl/register";
 
-// @ts-ignore
-import Plyr, { Track } from 'plyr';
-import { Language, Video } from '@/types';
+const store = useAppStore();
+const dialog = defineModel<boolean>();
 
-import CastButton from './button/CastButton.vue';
-import VideoButton from './button/VideoButton.vue';
-import SubtitleButton from './button/SubtitleButton.vue';
+const { xs, smAndDown } = useDisplay();
 
-@Component({
-  components: {
-    CastButton,
-    VideoButton,
-    SubtitleButton,
+const loading = ref(false);
+const videoMedia = ref<MediaItemVideo | null>(null);
+const subtitleMedia = ref<MediaItemVideo | null>(null);
+
+const videoTitle = computed(() => store.selectedVideo?.title);
+const videoPoster = computed(
+  () => findBestImage(store.selectedVideo?.images ?? {}) ?? undefined,
+);
+
+const jwOrgUrl = computed(() => {
+  const { primaryCategory, languageAgnosticNaturalKey } =
+    store.selectedVideo ?? {};
+
+  return `https://www.jw.org/finder?locale=${store.siteLocale}&category=${primaryCategory}&lank=${languageAgnosticNaturalKey}`;
+});
+
+const captionUrl = computed(() => {
+  const captionFile = (videoMedia.value ?? store.selectedVideo)?.files.find(
+    (file) => !!file.subtitles?.url,
+  );
+  return captionFile?.subtitles?.url || null;
+});
+
+const subtitleUrl = computed(() => {
+  const subFile = subtitleMedia.value?.files.find(
+    (file) => !!file.subtitles?.url,
+  );
+  return subFile?.subtitles?.url || null;
+});
+
+const availableLanguages = computed(() => {
+  if (!store.selectedVideo) return [];
+  return store.languages.filter((lang) =>
+    store.selectedVideo?.availableLanguages.includes(lang.code),
+  );
+});
+
+const fetchMediaItems = async () => {
+  if (!store.selectedVideo) return;
+
+  loading.value = true;
+
+  const [video, subtitle] = await Promise.all([
+    store.videoLanguage && store.videoLocale !== store.siteLocale
+      ? fetchMediaItem(
+          store.videoLanguage.code,
+          store.selectedVideo.languageAgnosticNaturalKey,
+        )
+      : null,
+    store.subtitleLanguage && store.subtitleLocale !== store.siteLocale
+      ? fetchMediaItem(
+          store.subtitleLanguage.code,
+          store.selectedVideo.languageAgnosticNaturalKey,
+        )
+      : null,
+  ]);
+
+  videoMedia.value = video ?? store.selectedVideo;
+  subtitleMedia.value = subtitle ?? store.selectedVideo;
+
+  loading.value = false;
+};
+
+watchImmediate(
+  () => [store.selectedVideo, store.videoLocale, store.subtitleLocale],
+  () => {
+    fetchMediaItems();
   },
-})
-export default class VideoDialog extends Vue {
-  player: Plyr | null = null;
-  loading: boolean = true;
-  videoMedia: Video | null = null;
-  subtitleMedia: Video | null = null;
-
-  @State mediatorUrl!: string;
-  @State languages!: Language[];
-  @State translations!: { [key: string]: string };
-
-  @State videoDialog!: boolean;
-  @State selectedVideo!: Video;
-  @Mutation setVideoDialog!: (value: boolean) => void;
-  @Mutation setSelectedVideo!: (value: Video | null) => void;
-
-  @Getter getSiteLanguage!: Language;
-  @Getter getVideoLanguage!: Language;
-  @Getter getSubtitleLanguage!: Language;
-  @Mutation setVideoLanguage!: (value: string) => void;
-  @Mutation setSubtitleLanguage!: (value: string) => void;
-
-  // eslint-disable-next-line class-methods-use-this
-  languageLabel(item: Language) {
-    return item.name === item.vernacular ? item.name : `${item.name} (${item.vernacular})`;
-  }
-
-  get xsOnly() {
-    return this.$vuetify.breakpoint.xsOnly;
-  }
-
-  get videoTitle() {
-    return (this.selectedVideo ?? this.videoMedia)?.title;
-  }
-
-  get videoPoster() {
-    return (this.selectedVideo ?? this.videoMedia)?.images.wss.lg;
-  }
-
-  get jwOrgUrl() {
-    const { locale } = this.getSiteLanguage;
-    const { primaryCategory, languageAgnosticNaturalKey } =
-      this.selectedVideo ?? this.videoMedia ?? {};
-    return `https://www.jw.org/finder?locale=${locale}&category=${primaryCategory}&lank=${languageAgnosticNaturalKey}`;
-  }
-
-  get captionUrl() {
-    const found = this.videoMedia?.files.find(file => file?.subtitles?.url !== undefined);
-    if (found === undefined) return null;
-    return found.subtitles.url;
-  }
-
-  get subtitleUrl() {
-    const found = this.subtitleMedia?.files.find(file => file?.subtitles?.url !== undefined);
-    if (found === undefined) return null;
-    return found.subtitles.url;
-  }
-
-  get availableLanguages() {
-    if (!this.selectedVideo) {
-      return [];
-    }
-    return this.languages.filter(language =>
-      this.selectedVideo.availableLanguages.includes(language.code),
-    );
-  }
-
-  get dialog() {
-    return this.videoDialog;
-  }
-
-  set dialog(value) {
-    this.setVideoDialog(value);
-  }
-
-  get videoLanguage() {
-    return this.getVideoLanguage.locale ?? this.getSiteLanguage.locale;
-  }
-
-  set videoLanguage(language: string) {
-    if (language === null) return;
-    this.setVideoLanguage(language);
-  }
-
-  get subtitleLanguage() {
-    return this.getSubtitleLanguage.locale ?? 'nl';
-  }
-
-  set subtitleLanguage(language: string) {
-    if (language === null) return;
-    this.setSubtitleLanguage(language);
-  }
-
-  get videoOptions(): Plyr.Options {
-    return {
-      quality: {
-        default: 1080,
-        options: [1080, 720, 480, 360, 240],
-      },
-      captions: {
-        active: true,
-        language: this.getSubtitleLanguage.locale,
-        update: true,
-      },
-      speed: { selected: 1, options: [0.75, 1, 1.25, 1.5] },
-    };
-  }
-
-  getMediaUrl(language: Language) {
-    return `${this.mediatorUrl}/media-items/${language.code}/${this.selectedVideo?.languageAgnosticNaturalKey}?clientType=www`;
-  }
-
-  loadPlayer() {
-    if (this.player) {
-      this.player.destroy();
-    }
-
-    this.player = new Plyr('#player', this.videoOptions);
-    const tracks: Track[] = [];
-    if (this.captionUrl) {
-      tracks.push({
-        kind: 'captions',
-        label: this.languageLabel(this.getVideoLanguage),
-        srcLang: this.getVideoLanguage.locale,
-        src: this.captionUrl,
-      });
-    }
-    if (this.subtitleUrl) {
-      tracks.push({
-        kind: 'subtitles',
-        label: this.languageLabel(this.getSubtitleLanguage),
-        srcLang: this.getSubtitleLanguage.locale,
-        src: this.subtitleUrl,
-      });
-    }
-    this.player.source = {
-      type: 'video',
-      poster: this.videoPoster,
-      title: this.selectedVideo.title,
-      sources:
-        this.videoMedia?.files.map(file => ({
-          src: file.progressiveDownloadURL,
-          type: file.mimetype,
-          size: parseInt(file.label.slice(0, -1), 10),
-        })) ?? [],
-      tracks,
-    };
-  }
-
-  async loadMediaItems() {
-    this.loading = true;
-    if (this.videoMedia === null) {
-      [this.videoMedia] = (await axios.get(this.getMediaUrl(this.getVideoLanguage))).data.media;
-    }
-    if (this.selectedVideo === null) {
-      this.setSelectedVideo(this.videoMedia);
-    }
-    if (this.subtitleMedia === null) {
-      [this.subtitleMedia] = (
-        await axios.get(this.getMediaUrl(this.getSubtitleLanguage))
-      ).data.media;
-    }
-    this.loading = false;
-  }
-
-  @Watch('loading')
-  onLoadingChange(loading: boolean) {
-    if (!loading) {
-      this.$nextTick(() => {
-        this.loadPlayer();
-      });
-    }
-  }
-
-  @Watch('videoDialog')
-  onVideoDialogChange(active: boolean) {
-    if (!active) {
-      // @ts-ignore
-      if (this.player?.media) {
-        this.player.stop();
-      } else {
-        document.querySelector('video')?.pause();
-      }
-    }
-  }
-
-  @Watch('selectedVideo')
-  onSelectedVideoChange(video: Video) {
-    if (video === null) {
-      return;
-    }
-    this.videoMedia = null;
-    this.subtitleMedia = null;
-    if (this.getSiteLanguage.locale === this.videoLanguage) {
-      this.videoMedia = video;
-    }
-    if (this.getSiteLanguage.locale === this.subtitleLanguage) {
-      this.subtitleMedia = video;
-    }
-    this.loadMediaItems();
-  }
-
-  @Watch('videoLanguage')
-  onVideoLanguageChange() {
-    (this.$refs.vidLangSelect as any).blur();
-    this.videoMedia = null;
-    this.loadMediaItems();
-  }
-
-  @Watch('subtitleLanguage')
-  onSubtitleLanguageChange() {
-    (this.$refs.subLangSelect as any).blur();
-    this.subtitleMedia = null;
-    this.loadMediaItems();
-  }
-}
+);
 </script>
-<style lang="scss">
-.img-loading {
-  .v-image__image {
-    filter: blur(5px);
-  }
-}
-
-.plyr {
-  height: 100%;
-  --plyr-font-size-xlarge: 36px;
-  --plyr-font-size-large: 22px;
-}
-
-.plyr__poster {
-  background-size: cover !important;
-}
-</style>
